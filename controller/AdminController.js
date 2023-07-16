@@ -197,6 +197,10 @@ exports.adminEdit = (req = request, res = response) => {
 exports.createRolePermission = (req = request, res = response) => {
     try {
         const { roleId, permissions } = req.body;
+        let new_permissions=permissions;
+        if (typeof permissions == "string") {
+            new_permissions = permissions.split(",");
+        }
         RolePermission.where({ roleId: roleId }).findOne().then(data => {
             if (data) {
                 res.status(200).json({ message: "This Role IS Already Setted A Permission,Please Edit a Permission", status: true });
@@ -204,7 +208,7 @@ exports.createRolePermission = (req = request, res = response) => {
             } else {
                 const newrp = new RolePermission({
                     roleId,
-                    permissions
+                    permissions:new_permissions
                 });
                 newrp.populate("roleId");
                 newrp.save().then(data => {
@@ -223,11 +227,12 @@ exports.addPermission = (req = request, res = response) => {
     try {
         const { id, permissions } = req.body;
         let new_permissions = permissions;
+
         if (typeof permissions == "string") {
             new_permissions = permissions.split(",");
         }
         RolePermission.findOneAndUpdate({ _id: id },
-            { $push: { permissions: { $each: new_permissions } } },
+            { $addToSet: { permissions: { $each: new_permissions } } },
             { new: true }
         ).populate("roleId").then(data => {
             res.status(200).json({ message: `${data.get("roleId").get("rolename")} Permission Updated`, status: true });
@@ -242,11 +247,12 @@ exports.removePermission = (req = request, res = response) => {
     try {
         const { id, permissions } = req.body;
         var new_permissions = permissions;
+        console.log(typeof permissions);
         if (typeof permissions == "string") {
             new_permissions = permissions.split(",");
         }
         RolePermission.findOneAndUpdate({ _id: id },
-            { $pull: { permissions: new_permissions } },
+            { $pullAll: { permissions: new_permissions } },
             { new: true }).populate("roleId")
             .then(data => {
                 res.status(200).json({ message: `${data.get("roleId").get("rolename")} Permission Updated`, status: true })
@@ -259,7 +265,7 @@ exports.removePermission = (req = request, res = response) => {
 
 exports.viewAllRolePermissions=(req=request,res=response)=>{
     try {
-        RolePermission.find().then(data=>{
+        RolePermission.find().populate("roleId",'rolename').then(data=>{
             res.status(200).json({data,status:true});
         })
     } catch (error) {
