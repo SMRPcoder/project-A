@@ -252,8 +252,19 @@ exports.removePermission = (req = request, res = response) => {
                 res.status(200).json({ message: `${data.get("roleId").get("rolename")} Permission Updated`, status: true })
             })
     } catch (error) {
-
+        console.error(`Error While Removing Permission to a Role ${error}`);
+        res.status(500).json({ message: "Error While Removing Permission to a Role", status: false });
     }
 }
 
+exports.viewAllRolePermissions=(req=request,res=response)=>{
+    try {
+        RolePermission.find().then(data=>{
+            res.status(200).json({data,status:true});
+        })
+    } catch (error) {
+        console.error(`Error While Removing Permission to a Role ${error}`);
+        res.status(500).json({ message: "Error While Removing Permission to a Role", status: false });
+    }
+}
 

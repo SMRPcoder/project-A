@@ -28,6 +28,8 @@ AdminRouter.post("/deleteUser",auth_admin,AdminController.deleteUser);
 AdminRouter.post("/createRolePermission",auth_admin,AdminController.createRolePermission);
 AdminRouter.post("/addPermission",auth_admin,AdminController.addPermission);
 AdminRouter.post("/removePermission",auth_admin,AdminController.removePermission);
+AdminRouter.post("/viewAllRolePermission",auth_admin,AdminController.viewAllRolePermissions);
+
 
 
 module.exports=AdminRouter;
