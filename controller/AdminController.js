@@ -4,10 +4,11 @@ const { validateWith } = require("../validation/validate");
 const User = require("../models/User");
 const Role = require("../models/Role");
 const { createJWT } = require("../functions/function");
+const RolePermission = require("../models/RolePermission");
 
 exports.viewRolesList = (req = request, res = response) => {
     try {
-        Role.where({ rolename: { ne: "ADMIN" } }).find().then(data => {
+        Role.where({ rolename: { $ne: "ADMIN" } }).find().then(data => {
             res.status(200).json({ data: data, status: true });
         })
     } catch (error) {
@@ -62,7 +63,7 @@ exports.addUser = (req = request, res = response) => {
     }
 }
 
-exports.viewAllEmployee = async (req = request, res = response) => {
+exports.viewAllEmployees = async (req = request, res = response) => {
     try {
         const roleData = await Role.where({ rolename: "EMPLOYEE" }).findOne()
         User.where({ roleId: roleData._id }).find().populate("roleId").then(data => {
@@ -112,21 +113,21 @@ exports.viewUser = (req = request, res = response) => {
 
 exports.editEmployee = (req = request, res = response) => {
     try {
-        const { id, firstname, lastname, email, roleId } = req.body;
-        Role.where({ _id: roleId }).findOne().then(data => {
-            if (data && data.get("rolename") == "EMPLOYEE") {
-                User.findOneAndUpdate({ _id: id }, {
-                    firstname,
-                    lastname,
-                    email
-                }).then(data => {
-                    res.status(200).json({ message: "Edited Successfully", status: true });
-
-                })
-            } else {
-                res.status(202).json({ message: "Employee Not Found", status: false })
-            }
+        const { id, firstname, lastname, email } = req.body;
+        // Role.where({ _id: roleId }).findOne().then(data => {
+        // if (data && data.get("rolename") == "EMPLOYEE") {
+        User.findOneAndUpdate({ _id: id }, {
+            firstname,
+            lastname,
+            email
+        }).then(data => {
+            res.status(200).json({ message: "Edited Successfully", status: true });
         })
+        // } else {
+        //     res.status(202).json({ message: "Employee Not Found", status: false })
+        // }
+        // }
+        // )
 
     } catch (error) {
         console.error(`Error While Editing a Employee: ${error}`);
@@ -137,20 +138,20 @@ exports.editEmployee = (req = request, res = response) => {
 exports.editUser = (req, res) => {
     try {
         const { id, firstname, lastname, email, roleId } = req.body;
-        Role.where({ _id: roleId }).findOne().then(data => {
-            if (data && data.get("rolename") == "USER") {
-                User.findOneAndUpdate({ _id: id }, {
-                    firstname,
-                    lastname,
-                    email
-                }).then(data => {
-                    res.status(200).json({ message: "Edited Successfully", status: true });
+        // Role.where({ _id: roleId }).findOne().then(data => {
+        //     if (data && data.get("rolename") == "USER") {
+        User.findOneAndUpdate({ _id: id }, {
+            firstname,
+            lastname,
+            email
+        }).then(data => {
+            res.status(200).json({ message: "Edited Successfully", status: true });
 
-                })
-            } else {
-                res.status(202).json({ message: "Employee Not Found", status: false })
-            }
         })
+        //     } else {
+        //         res.status(202).json({ message: "Employee Not Found", status: false })
+        //     }
+        // })
 
     } catch (error) {
         console.error(`Error While Editing a User: ${error}`);
@@ -193,5 +194,66 @@ exports.adminEdit = (req = request, res = response) => {
     }
 }
 
+exports.createRolePermission = (req = request, res = response) => {
+    try {
+        const { roleId, permissions } = req.body;
+        RolePermission.where({ roleId: roleId }).findOne().then(data => {
+            if (data) {
+                res.status(200).json({ message: "This Role IS Already Setted A Permission,Please Edit a Permission", status: true });
+
+            } else {
+                const newrp = new RolePermission({
+                    roleId,
+                    permissions
+                });
+                newrp.populate("roleId");
+                newrp.save().then(data => {
+                    res.status(200).json({ message: `Permission Seted Successfully To A Role ${data.get("roleId").get("rolename")}`, status: true })
+                })
+
+            }
+        })
+    } catch (error) {
+        console.error(`Error While Adding Permission: ${error}`);
+        res.status(500).json({ message: "Error While Adding Permission", status: false });
+    }
+}
+
+exports.addPermission = (req = request, res = response) => {
+    try {
+        const { id, permissions } = req.body;
+        let new_permissions = permissions;
+        if (typeof permissions == "string") {
+            new_permissions = permissions.split(",");
+        }
+        RolePermission.findOneAndUpdate({ _id: id },
+            { $push: { permissions: { $each: new_permissions } } },
+            { new: true }
+        ).populate("roleId").then(data => {
+            res.status(200).json({ message: `${data.get("roleId").get("rolename")} Permission Updated`, status: true });
+        })
+    } catch (error) {
+        console.error(`Error While Adding Permission to a Role ${error}`);
+        res.status(500).json({ message: "Error While Adding Permission to a Role", status: false });
+    }
+}
+
+exports.removePermission = (req = request, res = response) => {
+    try {
+        const { id, permissions } = req.body;
+        var new_permissions = permissions;
+        if (typeof permissions == "string") {
+            new_permissions = permissions.split(",");
+        }
+        RolePermission.findOneAndUpdate({ _id: id },
+            { $pull: { permissions: new_permissions } },
+            { new: true }).populate("roleId")
+            .then(data => {
+                res.status(200).json({ message: `${data.get("roleId").get("rolename")} Permission Updated`, status: true })
+            })
+    } catch (error) {
+
+    }
+}
 
 
