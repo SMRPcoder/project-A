@@ -9,6 +9,7 @@ const RolePermission = require("../models/RolePermission");
 exports.viewRolesList = (req = request, res = response) => {
     try {
         Role.where({ rolename: { $ne: "ADMIN" } }).find().then(data => {
+           
             res.status(200).json({ data: data, status: true });
         })
     } catch (error) {
@@ -19,6 +20,7 @@ exports.viewRolesList = (req = request, res = response) => {
 
 exports.addUser = (req = request, res = response) => {
     try {
+        console.log("is in")
         const is_valid = validateWith(AddUserSchema, req.body);
         if (is_valid.status) {
             const { email, firstname, roleId, lastname, password } = req.body;
@@ -66,7 +68,7 @@ exports.addUser = (req = request, res = response) => {
 exports.viewAllEmployees = async (req = request, res = response) => {
     try {
         const roleData = await Role.where({ rolename: "EMPLOYEE" }).findOne()
-        User.where({ roleId: roleData._id }).find().populate("roleId").then(data => {
+        User.where({ roleId: roleData._id }).find().select('-password').populate("roleId").then(data => {
             res.status(200).json({ data: data, status: true });
         })
     } catch (error) {
@@ -78,7 +80,7 @@ exports.viewAllEmployees = async (req = request, res = response) => {
 exports.viewEmployee = async (req = request, res = response) => {
     try {
 
-        User.where({ _id: req.body.id }).find().populate("roleId").then(data => {
+        User.where({ _id: req.body.id }).findOne().populate("roleId").then(data => {
             res.status(200).json({ data: data, status: true });
         })
     } catch (error) {
