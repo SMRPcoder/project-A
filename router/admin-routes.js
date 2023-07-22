@@ -9,16 +9,16 @@ AdminRouter.get("/getRolesList",auth_admin,AdminController.viewRolesList);
 AdminRouter.post("/adduser",auth_admin,upload.single("file"),AdminController.addUser);
 
 // view all
-AdminRouter.post("/viewAllEmployees",auth_admin,AdminController.viewAllEmployees);
-AdminRouter.post("/viewAllUsers",auth_admin,AdminController.viewAllUsers);
+AdminRouter.post("/viewAll",auth_admin,AdminController.viewAll);
+// AdminRouter.post("/viewAllUsers",auth_admin,AdminController.viewAllUsers);
 
 // view single
-AdminRouter.post("/viewEmployee",auth_admin,AdminController.viewEmployee);
-AdminRouter.post("/viewUser",auth_admin,AdminController.viewUser);
+AdminRouter.post("/viewOne",auth_admin,AdminController.viewOne);
+// AdminRouter.post("/viewUser",auth_admin,AdminController.viewUser);
 
 // edit
-AdminRouter.post("/editEmployee",auth_admin,AdminController.editEmployee);
-AdminRouter.post("/editUser",auth_admin,AdminController.editUser);
+AdminRouter.post("/editOne",auth_admin,AdminController.editOne);
+// AdminRouter.post("/editUser",auth_admin,AdminController.editUser);
 
 // delete
 AdminRouter.post("/deleteUser",auth_admin,AdminController.deleteUser);

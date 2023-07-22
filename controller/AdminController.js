@@ -65,9 +65,9 @@ exports.addUser = (req = request, res = response) => {
     }
 }
 
-exports.viewAllEmployees = async (req = request, res = response) => {
+exports.viewAll = async (req = request, res = response) => {
     try {
-        const roleData = await Role.where({ rolename: "EMPLOYEE" }).findOne()
+        const roleData = await Role.where({ rolename: req.body.role.toUpperCase() }).findOne()
         User.where({ roleId: roleData._id }).find().select('-password').populate("roleId").then(data => {
             res.status(200).json({ data: data, status: true });
         })
@@ -77,7 +77,7 @@ exports.viewAllEmployees = async (req = request, res = response) => {
     }
 }
 
-exports.viewEmployee = async (req = request, res = response) => {
+exports.viewOne= async (req = request, res = response) => {
     try {
 
         User.where({ _id: req.body.id }).findOne().populate("roleId").then(data => {
@@ -89,35 +89,33 @@ exports.viewEmployee = async (req = request, res = response) => {
     }
 }
 
-exports.viewAllUsers = async (req = request, res = response) => {
-    try {
-        const roleData = await Role.where({ rolename: "USER" }).findOne().exec()
-        User.where({ roleId: roleData._id }).find().populate("roleId").then(data => {
-            res.status(200).json({ data: data, status: true });
-        })
-    } catch (error) {
-        console.error(`Error While Fetching Users Details - Error: ${error}`);
-        res.status(500).json({ message: `Error While Fetching Users Details-${error}`, status: false });
-    }
-}
+// exports.viewAllUsers = async (req = request, res = response) => {
+//     try {
+//         const roleData = await Role.where({ rolename: "USER" }).findOne().exec()
+//         User.where({ roleId: roleData._id }).find().populate("roleId").then(data => {
+//             res.status(200).json({ data: data, status: true });
+//         })
+//     } catch (error) {
+//         console.error(`Error While Fetching Users Details - Error: ${error}`);
+//         res.status(500).json({ message: `Error While Fetching Users Details-${error}`, status: false });
+//     }
+// }
 
-exports.viewUser = (req = request, res = response) => {
-    try {
-        // const roleData=await Role.where({rolename:"USER"}).findOne().exec()
-        User.where({ _id: req.body.id }).find().populate("roleId").then(data => {
-            res.status(200).json({ data: data, status: true });
-        })
-    } catch (error) {
-        console.error(`Error While Fetching Users Details - Error: ${error}`);
-        res.status(500).json({ message: "Error While Fetching Users Details", status: false });
-    }
-}
+// exports.viewUser = (req = request, res = response) => {
+//     try {
+//         // const roleData=await Role.where({rolename:"USER"}).findOne().exec()
+//         User.where({ _id: req.body.id }).find().populate("roleId").then(data => {
+//             res.status(200).json({ data: data, status: true });
+//         })
+//     } catch (error) {
+//         console.error(`Error While Fetching Users Details - Error: ${error}`);
+//         res.status(500).json({ message: "Error While Fetching Users Details", status: false });
+//     }
+// }
 
-exports.editEmployee = (req = request, res = response) => {
+exports.editOne = (req = request, res = response) => {
     try {
         const { id, firstname, lastname, email } = req.body;
-        // Role.where({ _id: roleId }).findOne().then(data => {
-        // if (data && data.get("rolename") == "EMPLOYEE") {
         User.findOneAndUpdate({ _id: id }, {
             firstname,
             lastname,
@@ -125,11 +123,6 @@ exports.editEmployee = (req = request, res = response) => {
         }).then(data => {
             res.status(200).json({ message: "Edited Successfully", status: true });
         })
-        // } else {
-        //     res.status(202).json({ message: "Employee Not Found", status: false })
-        // }
-        // }
-        // )
 
     } catch (error) {
         console.error(`Error While Editing a Employee: ${error}`);
@@ -137,29 +130,23 @@ exports.editEmployee = (req = request, res = response) => {
     }
 }
 
-exports.editUser = (req, res) => {
-    try {
-        const { id, firstname, lastname, email, roleId } = req.body;
-        // Role.where({ _id: roleId }).findOne().then(data => {
-        //     if (data && data.get("rolename") == "USER") {
-        User.findOneAndUpdate({ _id: id }, {
-            firstname,
-            lastname,
-            email
-        }).then(data => {
-            res.status(200).json({ message: "Edited Successfully", status: true });
+// exports.editUser = (req, res) => {
+//     try {
+//         const { id, firstname, lastname, email, roleId } = req.body;
+//         User.findOneAndUpdate({ _id: id }, {
+//             firstname,
+//             lastname,
+//             email
+//         }).then(data => {
+//             res.status(200).json({ message: "Edited Successfully", status: true });
 
-        })
-        //     } else {
-        //         res.status(202).json({ message: "Employee Not Found", status: false })
-        //     }
-        // })
+//         })
 
-    } catch (error) {
-        console.error(`Error While Editing a User: ${error}`);
-        res.status(500).json({ message: "Error While Editing A User", status: false });
-    }
-}
+//     } catch (error) {
+//         console.error(`Error While Editing a User: ${error}`);
+//         res.status(500).json({ message: "Error While Editing A User", status: false });
+//     }
+// }
 
 exports.deleteUser = (req = request, res = response) => {
     try {
