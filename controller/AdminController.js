@@ -116,12 +116,16 @@ exports.viewOne= async (req = request, res = response) => {
 exports.editOne = (req = request, res = response) => {
     try {
         const { id, firstname, lastname, email } = req.body;
-
-        User.findOneAndUpdate({ _id: id }, {
+        var editedUser={
             firstname,
             lastname,
             email
-        },{new:true}).then(data => {
+        };
+        if(req.file){
+            editedUser["profile"]=req.file.path;
+        }
+
+        User.findOneAndUpdate({ _id: id }, editedUser,{new:true}).then(data => {
             res.status(200).json({ message: "Edited Successfully", status: true });
         })
 
@@ -170,7 +174,7 @@ exports.adminEdit = (req = request, res = response) => {
             if (req.file) {
                 newupdatedata["profile"] = req.file.path
             }
-            User.findOneAndUpdate({ _id: req.user_id }, newupdatedata).then(data => {
+            User.findOneAndUpdate({ _id: req.user_id }, newupdatedata,{new:true}).then(data => {
                 console.log(data);
                 res.status(200).json({ message: "Updated successfully", data: data })
             })
