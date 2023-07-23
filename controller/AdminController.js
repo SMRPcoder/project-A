@@ -170,7 +170,7 @@ exports.adminEdit = (req = request, res = response) => {
             if (req.file) {
                 newupdatedata["profile"] = req.file.path
             }
-            User.findOneAndUpdate({ _id: req.user_id }, newupdatedata,{new:true}).then(data => {
+            User.findOneAndUpdate({ _id: req.user_id }, newupdatedata).then(data => {
                 console.log(data);
                 res.status(200).json({ message: "Updated successfully", data: data })
             })
