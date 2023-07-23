@@ -17,7 +17,7 @@ AdminRouter.post("/viewOne",auth_admin,AdminController.viewOne);
 // AdminRouter.post("/viewUser",auth_admin,AdminController.viewUser);
 
 // edit
-AdminRouter.post("/editOne",auth_admin,AdminController.editOne);
+AdminRouter.post("/editOne",auth_admin,upload.single("file"),AdminController.editOne);
 // AdminRouter.post("/editUser",auth_admin,AdminController.editUser);
 
 // delete
