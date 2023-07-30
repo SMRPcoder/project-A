@@ -10,7 +10,9 @@ const AddUserSchema=joi.object({
         firstname:joi.string().min(2).required(),
         lastname:joi.string().min(1),
         password:joi.string().min(8).required(),
-        roleId:joi.string().required()
+        roleId:joi.string().required(),
+        emp_id:joi.string(),
+        file:joi.allow()
 });
 const DevUserSchema=joi.object({
         email:joi.string().email().min(4).required(),

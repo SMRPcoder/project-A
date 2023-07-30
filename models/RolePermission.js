@@ -6,7 +6,7 @@ const RolePermissionSchema=new Schema({
         type:Schema.Types.ObjectId,
         ref:"Role"
     },
-    permission:{
+    permissions:{
         type:Schema.Types.Array
     }
 },{

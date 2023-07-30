@@ -12,6 +12,7 @@ module.exports = auth_admin = (req = request, res = response, next) => {
             const private = fs.readFileSync('private.key');
             const { email, role, roleId, _id } = jwt.verify(token, private, { algorithms: "RS256" });
             if (role == "ADMIN") {
+
                 User.where({ _id: _id }).findOne().then(data => {
                     if (data) {
                         req.email = email;
@@ -29,6 +30,7 @@ module.exports = auth_admin = (req = request, res = response, next) => {
         } else {
             res.status(401).json({ message: "Token Not Provided", status: false })
         }
+
 
     } catch (error) {
         console.error(`Error Occured In middleware- Error : ${error}`)

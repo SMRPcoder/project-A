@@ -3,6 +3,7 @@ const { AddUserSchema, EditUserSchema } = require("../validation/validationSchem
 const { validateWith } = require("../validation/validate");
 const User = require("../models/User");
 const Role = require("../models/Role");
+const fs =require("fs");
 const { createJWT } = require("../functions/function");
 const RolePermission = require("../models/RolePermission");
 
@@ -14,9 +15,20 @@ exports.viewRolesList = (req = request, res = response) => {
         })
     } catch (error) {
         console.error(`Error While Fetching Role Details - Error: ${error}`);
-        res.status(500).json({ message: "Error While Role Employee Details", status: false });
+        res.status(500).json({ message: "Error While Fetching Role Details", status: false });
     }
 }
+
+// exports.viewRolesAndPermissions=((req=request,res=response)=>{
+//     try {
+//         RolePermission.find().populate('roleId').then(data=>{
+//             res.status(200).json({data:data,status:true});
+//         })
+//     } catch (error) {
+//         console.error(`Error While Fetching RolePermission with role Details - Error: ${error}`);
+//         res.status(500).json({ message: "Error While Fetching RolePermission with role Details", status: false });
+//     }
+// })
 
 exports.addUser = (req = request, res = response) => {
     try {
@@ -41,7 +53,8 @@ exports.addUser = (req = request, res = response) => {
                         firstname,
                         lastname,
                         roleId,
-                        password
+                        password,
+                        mainId:req.body.emp_id?req.body.emp_id:req.user_id
                     }
                     if (req.file) {
                         newuserupdate["profile"] = req.file.path;
@@ -125,8 +138,13 @@ exports.editOne = (req = request, res = response) => {
             editedUser["profile"]=req.file.path;
         }
 
-        User.findOneAndUpdate({ _id: id }, editedUser,{new:true}).then(data => {
-            res.status(200).json({ message: "Edited Successfully", status: true });
+        User.findOneAndUpdate({ _id: id }, editedUser).then(data => {
+            fs.unlink(data["profile"],(err)=>{
+                if(err){
+                    return res.status(500).json({message:`file updated But Something happens in the path ${data["profile"]} `,status:false})
+                }
+            });
+            res.status(200).json({ message: "Edited Successfully",data:data, status: true });
         })
 
     } catch (error) {
@@ -197,7 +215,7 @@ exports.createRolePermission = (req = request, res = response) => {
         }
         RolePermission.where({ roleId: roleId }).findOne().then(data => {
             if (data) {
-                res.status(200).json({ message: "This Role IS Already Setted A Permission,Please Edit a Permission", status: true });
+                res.status(200).json({ message: "This Role iS Already Setted A Permission,Please Edit a Permission", status: true });
 
             } else {
                 const newrp = new RolePermission({
@@ -259,12 +277,27 @@ exports.removePermission = (req = request, res = response) => {
 
 exports.viewAllRolePermissions=(req=request,res=response)=>{
     try {
-        RolePermission.find().populate("roleId",'rolename').then(data=>{
+        RolePermission.find().populate("roleId",["_id","rolename"]).then(data=>{
             res.status(200).json({data,status:true});
         })
     } catch (error) {
         console.error(`Error While Removing Permission to a Role ${error}`);
         res.status(500).json({ message: "Error While Removing Permission to a Role", status: false });
+    }
+}
+
+exports.viewOneRolePermisions=(req=request,res=response)=>{
+    try {
+        RolePermission.where({roleId:req.body.id}).findOne().then(data=>{
+            if(data){
+                res.status(200).json({data:data,status:true});
+            }else{
+                res.status(200).json({message:"No Data Found",status:false})
+            }
+        })
+    } catch (error) {
+        console.error(`Error While Fetch Permission to a Role ${error}`);
+        res.status(500).json({ message: "Error While Fetch Permission to a Role", status: false });
     }
 }
 

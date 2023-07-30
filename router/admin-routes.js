@@ -5,6 +5,7 @@ const auth_admin=require("../middleware/auth_admin");
 const AdminRouter=Router();
 
 //create process
+AdminRouter.get("/checkIsIn",auth_admin,(req,res)=>{res.status(200).json({status:true,message:"is logged in"})});
 AdminRouter.get("/getRolesList",auth_admin,AdminController.viewRolesList);
 AdminRouter.post("/adduser",auth_admin,upload.single("file"),AdminController.addUser);
 
@@ -28,7 +29,10 @@ AdminRouter.post("/deleteUser",auth_admin,AdminController.deleteUser);
 AdminRouter.post("/createRolePermission",auth_admin,AdminController.createRolePermission);
 AdminRouter.post("/addPermission",auth_admin,AdminController.addPermission);
 AdminRouter.post("/removePermission",auth_admin,AdminController.removePermission);
-AdminRouter.post("/viewAllRolePermission",auth_admin,AdminController.viewAllRolePermissions);
+AdminRouter.get("/viewAllRolePermission",auth_admin,AdminController.viewAllRolePermissions);
+AdminRouter.post("/viewRolePermission",auth_admin,AdminController.viewOneRolePermisions);
+// AdminRouter.post("/getRolePermission")
+
 
 
 
