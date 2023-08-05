@@ -7,6 +7,7 @@ const fs =require("fs");
 const { createJWT } = require("../functions/function");
 const RolePermission = require("../models/RolePermission");
 
+
 exports.viewRolesList = (req = request, res = response) => {
     try {
         Role.where({ rolename: { $ne: "ADMIN" } }).find().then(data => {
@@ -80,13 +81,14 @@ exports.addUser = (req = request, res = response) => {
 
 exports.viewAll = async (req = request, res = response) => {
     try {
-        const roleData = await Role.where({ rolename: req.body.role.toUpperCase() }).findOne()
+        const {role}=req.body;
+        const roleData = await Role.where({ rolename: role.toUpperCase() }).findOne().exec();
         User.where({ roleId: roleData._id }).find().select('-password').populate("roleId").then(data => {
             res.status(200).json({ data: data, status: true });
         })
     } catch (error) {
-        console.error(`Error While Fetching Employee Details - Error: ${error}`);
-        res.status(500).json({ message: "Error While Fetching Employee Details", status: false });
+        console.error(`Error While Fetching All Employee Details - Error: ${error}`);
+        res.status(500).json({ message: "Error While Fetching All Employee Details", status: false });
     }
 }
 
@@ -277,7 +279,8 @@ exports.removePermission = (req = request, res = response) => {
 
 exports.viewAllRolePermissions=(req=request,res=response)=>{
     try {
-        RolePermission.find().populate("roleId",["_id","rolename"]).then(data=>{
+
+        RolePermission.where({roleId:{$ne:req.roleId}}).find().populate("roleId",["_id","rolename"]).then(data=>{
             res.status(200).json({data,status:true});
         })
     } catch (error) {

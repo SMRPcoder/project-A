@@ -1,4 +1,4 @@
-const { request, response } = require("../app");
+const { request, response } = require("express");
 const { createJWT } = require("../functions/function");
 const User = require("../models/User");
 

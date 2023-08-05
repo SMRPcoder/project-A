@@ -5,6 +5,8 @@ const AuthRouter = require("./router/auth-routes");
 const RolesRouter = require("./router/role-routes");
 const flowRouter = require("./router/flow-routes");
 const AdminRouter = require("./router/admin-routes");
+const CustomerRouter = require("./router/customer-routes");
+const PaymentRouter = require("./router/payment-routes");
 
 
 require("dotenv").config();
@@ -15,10 +17,12 @@ app.use(cors());
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
 
-app.use("/api/user",AuthRouter);
+app.use("/api/auth",AuthRouter);
 app.use("/api/role",RolesRouter);
 app.use("/api/dev",flowRouter);
 app.use("/api/admin",AdminRouter);
+app.use("/api/customer",CustomerRouter);
+app.use("/api/payment",PaymentRouter);
 
 
 

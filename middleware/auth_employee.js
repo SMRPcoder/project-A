@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { request, response } = require("express");
 const User = require("../models/User");
 
-module.exports = auth_employee = (req = request, res = response, next) => {
+const auth_employee = (req = request, res = response, next) => {
 
     try {
         const { authorization } = req.headers;
@@ -36,3 +36,5 @@ module.exports = auth_employee = (req = request, res = response, next) => {
     }
 
 }
+
+module.exports=auth_employee;
